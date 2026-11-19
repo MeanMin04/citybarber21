@@ -54,7 +54,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=20261119-1">
+    <link rel="stylesheet" href="style.css?v=20261119-3">
 </head>
 <body>
 
@@ -76,6 +76,7 @@
     </nav>
 
     <header class="hero">
+        <button class="hero-photo-trigger" id="hero-photo-trigger" type="button" aria-label="Deschide fotografia cu interiorul salonului"></button>
         <div class="hero-overlay"></div>
         <div class="hero-content">
             <h4>Premium Grooming</h4>
@@ -114,6 +115,21 @@
             <p class="marketing-text">
                 La <strong>CITY BARBER</strong>, credem că imaginea ta este cartea ta de vizită. De aceea, scaunul nostru nu este doar un loc unde te tunzi, ci un spațiu de redefinire a stilului. Folosim tehnici avansate de fade, contur cu briciul și texturizare, pentru ca tu să pleci de aici arătând și simțindu-te impecabil.
             </p>
+        </div>
+    </section>
+
+    <section id="salon" class="section-padding bg-darker">
+        <div class="container">
+            <h2 class="section-title text-center">Descoperă salonul nostru</h2>
+            <p class="section-subtitle text-center">Un spațiu modern, creat pentru confortul tău.</p>
+            <div class="salon-photo-grid" role="group" aria-label="Fotografii din interiorul salonului CITY BARBER">
+                <button class="salon-photo" type="button" aria-label="Deschide fotografia cu zona de frizerie și relaxare" data-photo="poze/bg.jpeg" data-alt="Interiorul salonului CITY BARBER, cu scaunele de frizerie și zona de relaxare">
+                    <img src="poze/bg.jpeg" alt="Interiorul salonului CITY BARBER, cu scaunele de frizerie și zona de relaxare" loading="lazy" decoding="async">
+                </button>
+                <button class="salon-photo" type="button" aria-label="Deschide fotografia cu recepția salonului" data-photo="poze/WhatsApp%20Image%202026-11-18%20at%2017.15.48%20(5).jpeg" data-alt="Zona de recepție a salonului CITY BARBER">
+                    <img src="poze/WhatsApp%20Image%202026-11-18%20at%2017.15.48%20(5).jpeg" alt="Zona de recepție a salonului CITY BARBER" loading="lazy" decoding="async">
+                </button>
+            </div>
         </div>
     </section>
 
@@ -282,19 +298,48 @@
             const btnPrevImage = document.querySelector('.lightbox-prev');
             const btnNextImage = document.querySelector('.lightbox-next');
             const galleryItems = Array.from(galleryGrid.querySelectorAll('.gallery-item'));
+            const heroPhotoTrigger = document.getElementById('hero-photo-trigger');
+            const salonPhotos = Array.from(document.querySelectorAll('.salon-photo'));
+            const salonImages = salonPhotos.map((photo) => ({
+                src: photo.dataset.photo,
+                alt: photo.dataset.alt
+            }));
             let currentImageIndex = 0;
+            let activeImages = images;
+            let standaloneLightbox = false;
             let touchStart = null;
             function showLightboxImage(index) {
-                currentImageIndex = (index + images.length) % images.length;
-                const image = images[currentImageIndex];
+                currentImageIndex = (index + activeImages.length) % activeImages.length;
+                const image = activeImages[currentImageIndex];
                 lightboxImg.src = image.src;
                 lightboxImg.alt = image.alt;
             }
-            function openLightbox(index) {
+            function openLightbox(index, photoSet = images) {
+                standaloneLightbox = false;
+                activeImages = photoSet;
                 showLightboxImage(index);
+                btnPrevImage.hidden = activeImages.length <= 1;
+                btnNextImage.hidden = activeImages.length <= 1;
                 lightbox.classList.remove('lightbox-hidden'); lightbox.classList.add('lightbox-visible');
                 btnClose.focus();
             }
+            function openLightboxSource(src, alt) {
+                standaloneLightbox = true;
+                lightboxImg.src = src;
+                lightboxImg.alt = alt;
+                btnPrevImage.hidden = true;
+                btnNextImage.hidden = true;
+                lightbox.classList.remove('lightbox-hidden'); lightbox.classList.add('lightbox-visible');
+                btnClose.focus();
+            }
+            heroPhotoTrigger.addEventListener('click', () => {
+                openLightboxSource('poze/bg.jpeg', 'Interiorul salonului CITY BARBER');
+            });
+            salonPhotos.forEach((photo, index) => {
+                photo.addEventListener('click', () => {
+                    openLightbox(index, salonImages);
+                });
+            });
             galleryItems.forEach((item, index) => {
                 item.addEventListener('click', () => openLightbox(index));
             });
@@ -312,6 +357,7 @@
                 const deltaX = e.changedTouches[0].clientX - touchStart.x;
                 const deltaY = e.changedTouches[0].clientY - touchStart.y;
                 touchStart = null;
+                if (standaloneLightbox) return;
                 if (Math.abs(deltaX) < 50 || Math.abs(deltaX) <= Math.abs(deltaY)) return;
                 showLightboxImage(currentImageIndex + (deltaX < 0 ? 1 : -1));
             }, { passive: true });
@@ -328,6 +374,7 @@
             document.addEventListener('keydown', (e) => {
                 if (!lightbox.classList.contains('lightbox-visible')) return;
                 if (e.key === 'Escape') closeLightbox();
+                else if (standaloneLightbox) return;
                 else if (e.key === 'ArrowLeft') {
                     e.preventDefault();
                     showLightboxImage(currentImageIndex - 1);

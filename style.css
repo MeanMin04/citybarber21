@@ -49,8 +49,11 @@ section { scroll-margin-top: 80px; }
     background: url('poze/bg.jpeg') no-repeat center 42%/cover;
     position: relative; display: flex; align-items: center; justify-content: center; text-align: center;
 }
-.hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.45), #121212); }
-.hero-content { position: relative; z-index: 10; padding: 0 20px; width: 100%; margin-top: 20px; }
+.hero-photo-trigger { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; padding: 0; border: 0; background: transparent; cursor: zoom-in; }
+.hero-photo-trigger:focus-visible { outline: 3px solid var(--accent); outline-offset: -6px; }
+.hero-overlay { position: absolute; top: 0; left: 0; z-index: 2; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.45), #121212); pointer-events: none; }
+.hero-content { position: relative; z-index: 10; padding: 0 20px; width: 100%; margin-top: 20px; pointer-events: none; }
+.hero-content a { pointer-events: auto; }
 .hero-content h4 { color: var(--accent); font-size: 1.1rem; letter-spacing: 2px; margin-bottom: 10px; }
 .hero-content h1 { font-size: 4rem; line-height: 1.1; margin-bottom: 25px; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
 .hero-content p { color: #ddd; font-size: 1.05rem; margin-bottom: 35px; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.6; }
@@ -116,8 +119,14 @@ section { scroll-margin-top: 80px; }
 .gallery-instagram i { flex: 0 0 auto; color: var(--accent); font-size: 1.15rem; }
 .gallery-instagram a span { min-width: 0; }
 .gallery-instagram a:hover { color: var(--accent); }
+.salon-photo-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; max-width: 900px; margin: 0 auto; }
+.salon-photo { display: block; overflow: hidden; padding: 0; border: 1px solid #333; border-radius: 8px; background: var(--bg-card); cursor: pointer; }
+.salon-photo img { display: block; width: 100%; aspect-ratio: 3 / 4; object-fit: cover; transition: transform 0.3s ease; }
+.salon-photo:hover img { transform: scale(1.03); }
+.salon-photo:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
 @media (min-width: 768px) {
     .gallery-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+    .salon-photo-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
 }
 @media (min-width: 1000px) {
     .gallery-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
@@ -129,6 +138,7 @@ section { scroll-margin-top: 80px; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 #lightbox-img { max-width: calc(100% - 112px); max-height: 80vh; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); object-fit: contain; }
 .lightbox-nav { position: absolute; top: 50%; display: flex; width: 48px; height: 48px; align-items: center; justify-content: center; transform: translateY(-50%); border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; background: rgba(30,30,30,0.8); color: white; font-size: 1.3rem; cursor: pointer; z-index: 1; }
+.lightbox-nav[hidden] { display: none; }
 .lightbox-prev { left: 16px; }
 .lightbox-next { right: 16px; }
 .lightbox-close { position: absolute; top: 20px; right: 30px; color: white; font-size: 3rem; cursor: pointer; transition: color 0.2s; background: none; border: 0; z-index: 2; }
