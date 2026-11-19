@@ -54,7 +54,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=20261118-2">
+    <link rel="stylesheet" href="style.css?v=20261119-1">
 </head>
 <body>
 
@@ -283,6 +283,7 @@
             const btnNextImage = document.querySelector('.lightbox-next');
             const galleryItems = Array.from(galleryGrid.querySelectorAll('.gallery-item'));
             let currentImageIndex = 0;
+            let touchStart = null;
             function showLightboxImage(index) {
                 currentImageIndex = (index + images.length) % images.length;
                 const image = images[currentImageIndex];
@@ -299,6 +300,21 @@
             });
             btnPrevImage.addEventListener('click', () => showLightboxImage(currentImageIndex - 1));
             btnNextImage.addEventListener('click', () => showLightboxImage(currentImageIndex + 1));
+            lightbox.addEventListener('touchstart', (e) => {
+                if (e.touches.length !== 1) {
+                    touchStart = null;
+                    return;
+                }
+                touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            }, { passive: true });
+            lightbox.addEventListener('touchend', (e) => {
+                if (!touchStart || e.changedTouches.length !== 1) return;
+                const deltaX = e.changedTouches[0].clientX - touchStart.x;
+                const deltaY = e.changedTouches[0].clientY - touchStart.y;
+                touchStart = null;
+                if (Math.abs(deltaX) < 50 || Math.abs(deltaX) <= Math.abs(deltaY)) return;
+                showLightboxImage(currentImageIndex + (deltaX < 0 ? 1 : -1));
+            }, { passive: true });
             function closeLightbox() {
                 lightbox.classList.remove('lightbox-visible');
                 setTimeout(() => { lightbox.classList.add('lightbox-hidden'); }, 300);
